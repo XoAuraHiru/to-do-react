@@ -22,7 +22,7 @@ const App = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email/:token" element={<VerifyEmail />} />
           <Route path="/verify-email-sent" element={<VerifyEmailSent />} /> */}
-          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
           
           {/* Protected routes */}

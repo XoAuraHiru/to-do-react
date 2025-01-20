@@ -6,7 +6,8 @@ const {
   login,
   verifyEmail,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifyToken
 } = require('../controllers/auth.controller');
 
 const {
@@ -16,6 +17,8 @@ const {
   resetPasswordValidation,
   verifyEmailValidation
 } = require('../middleware/validation.middleware');
+
+const { protect } = require('../middleware/auth.middleware');
 
 // Register rout
 router.post('/register', registerValidation, register);
@@ -32,16 +35,7 @@ router.post('/forgot-password', forgotPasswordValidation, forgotPassword);
 // Reset password
 router.post('/reset-password/:token', resetPasswordValidation, resetPassword);
 
-// router.get('/verify-token', protect, (req, res) => {
-//   res.json({ 
-//     user: {
-//       id: req.user._id,
-//       email: req.user.email,
-//       firstName: req.user.firstName,
-//       lastName: req.user.lastName,
-//       isVerified: req.user.isVerified
-//     }
-//   });
-// });
+//verify token
+router.get('/verify-token', protect, verifyToken);
 
 module.exports = router;

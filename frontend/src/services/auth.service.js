@@ -51,14 +51,15 @@ const authService = {
     }
   },
 
-  verifyToken: async () => {
+  verifyEmail: async (token) => {
     try {
-      const response = await api.get('/verify-token');
-      return { success: true, user: response.data.user };
+      const response = await axios.get(`${API_URL}/verify-email/${token}`);
+      return { success: true, message: response.data.message };
     } catch (error) {
+      console.error('Email verification error:', error);
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Token verification failed' 
+        error: error.response?.data?.message || 'Email verification failed' 
       };
     }
   },

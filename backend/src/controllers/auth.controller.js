@@ -160,10 +160,34 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// Verify token
+const verifyToken = async (req, res) => {
+  try {
+    const user = req.user;
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isVerified: user.isVerified
+      }
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error verifying token'
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   verifyEmail,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifyToken
 };
