@@ -3,6 +3,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+// Routes to use
+const authRoutes = require('./routes/auth.routes');
+
 const app = express();
 
 // Middlewares to use
@@ -18,6 +21,14 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Task Management API' });
 });
+app.use('/api/auth', authRoutes);
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something went wrong!' });
+  });
 
 // Start server
 const PORT = process.env.PORT || 5000;
