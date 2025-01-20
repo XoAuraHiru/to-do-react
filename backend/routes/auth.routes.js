@@ -1,4 +1,4 @@
-
+// src/routes/auth.routes.js
 const express = require('express');
 const router = express.Router();
 const { 
@@ -9,19 +9,27 @@ const {
   resetPassword
 } = require('../controllers/auth.controller');
 
-// Register
-router.post('/register', register);
+const {
+  registerValidation,
+  loginValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+  verifyEmailValidation
+} = require('../middleware/validation.middleware');
 
-// Login
-router.post('/login', login);
+// Register rout
+router.post('/register', registerValidation, register);
+
+// Login route
+router.post('/login', loginValidation, login);
 
 // Email verification
-router.get('/verify-email/:token', verifyEmail);
+router.get('/verify-email/:token', verifyEmailValidation, verifyEmail);
 
 // Forgot password
-router.post('/forgot-password', forgotPassword);
+router.post('/forgot-password', forgotPasswordValidation, forgotPassword);
 
 // Reset password
-router.post('/reset-password/:token', resetPassword);
+router.post('/reset-password/:token', resetPasswordValidation, resetPassword);
 
 module.exports = router;
