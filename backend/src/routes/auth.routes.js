@@ -1,4 +1,4 @@
-// src/routes/auth.routes.js
+
 const express = require('express');
 const router = express.Router();
 const { 
@@ -31,5 +31,17 @@ router.post('/forgot-password', forgotPasswordValidation, forgotPassword);
 
 // Reset password
 router.post('/reset-password/:token', resetPasswordValidation, resetPassword);
+
+// router.get('/verify-token', protect, (req, res) => {
+//   res.json({ 
+//     user: {
+//       id: req.user._id,
+//       email: req.user.email,
+//       firstName: req.user.firstName,
+//       lastName: req.user.lastName,
+//       isVerified: req.user.isVerified
+//     }
+//   });
+// });
 
 module.exports = router;
