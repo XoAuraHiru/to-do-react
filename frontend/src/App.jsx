@@ -7,8 +7,8 @@ import Register from './components/auth/Register';
 //import ForgotPassword from './components/auth/ForgotPassword';
 //import ResetPassword from './components/auth/ResetPassword';
 import Dashboard from './components/dashboard/Dashboard';
-//import VerifyEmail from './components/auth/VerifyEmail';
-//import VerifyEmailSent from './components/auth/VerifyEmailSent';
+import VerifyEmail from './components/auth/VerifyEmail';
+import VerifyEmailSent from './components/auth/VerifyEmailSent';
 
 const App = () => {
   return (
@@ -22,6 +22,8 @@ const App = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email/:token" element={<VerifyEmail />} />
           <Route path="/verify-email-sent" element={<VerifyEmailSent />} /> */}
+          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+          <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
           
           {/* Protected routes */}
           <Route
