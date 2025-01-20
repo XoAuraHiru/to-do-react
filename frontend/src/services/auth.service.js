@@ -1,9 +1,8 @@
-// src/services/auth.service.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/auth';
 
-// Create axios instance with default config
+// Create axios instance 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -51,12 +50,23 @@ const authService = {
     }
   },
 
+  verifyToken: async () => {
+    try {
+      const response = await api.get('/verify-token');
+      return { success: true, user: response.data.user };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Token verification failed' 
+      };
+    }
+  },
+
   verifyEmail: async (token) => {
     try {
-      const response = await axios.get(`${API_URL}/verify-email/${token}`);
+      const response = await api.get(`/verify-email/${token}`);
       return { success: true, message: response.data.message };
     } catch (error) {
-      console.error('Email verification error:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Email verification failed' 
@@ -109,8 +119,8 @@ const authService = {
       
       return payload;
     } catch (error) {
+      console.error('Error parsing token:', error);
       localStorage.removeItem('token');
-      console.error('Error parsing token', error);
       return null;
     }
   }

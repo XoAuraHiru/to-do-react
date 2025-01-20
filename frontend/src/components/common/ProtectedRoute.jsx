@@ -1,4 +1,3 @@
-// src/components/common/ProtectedRoute.jsx
 import PropTypes from 'prop-types';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';

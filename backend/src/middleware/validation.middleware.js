@@ -98,10 +98,63 @@ const verifyEmailValidation = [
   validateRequest
 ];
 
+// Task validation rules
+const createTaskValidation = [
+  body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('Task title is required')
+    .isLength({ max: 200 })
+    .withMessage('Task title must be less than 200 characters'),
+  
+  body('scheduledFor')
+    .notEmpty()
+    .withMessage('Scheduled date and time is required')
+    .isISO8601()
+    .withMessage('Invalid date format')
+    .custom((value) => {
+      const scheduledDate = new Date(value);
+      const now = new Date();
+      if (scheduledDate < now) {
+        throw new Error('Scheduled date must be in the future');
+      }
+      return true;
+    }),
+  
+  validateRequest
+];
+
+const updateTaskValidation = [
+  body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('Task title is required')
+    .isLength({ max: 200 })
+    .withMessage('Task title must be less than 200 characters'),
+  
+  body('scheduledFor')
+    .notEmpty()
+    .withMessage('Scheduled date and time is required')
+    .isISO8601()
+    .withMessage('Invalid date format')
+    .custom((value) => {
+      const scheduledDate = new Date(value);
+      const now = new Date();
+      if (scheduledDate < now) {
+        throw new Error('Scheduled date must be in the future');
+      }
+      return true;
+    }),
+  
+  validateRequest
+];
+
 module.exports = {
   registerValidation,
   loginValidation,
   forgotPasswordValidation,
   resetPasswordValidation,
-  verifyEmailValidation
+  verifyEmailValidation,
+  createTaskValidation,
+  updateTaskValidation
 };

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.model').default;
-const logger = require('../config/logger').default;
+const User = require('../models/user.model');
+const logger = require('../config/logger');
 
 const protect = async (req, res, next) => {
   try {
@@ -47,7 +47,7 @@ const protect = async (req, res, next) => {
       });
     }
   } catch (error) {
-    logger.error('Auth middleware error', {
+    logger.error('Auth middleware error', { 
       error: error.message,
     });
     return res.status(500).json({

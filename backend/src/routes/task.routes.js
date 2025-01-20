@@ -4,34 +4,34 @@ const {
   getTasks,
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
+  toggleComplete
 } = require('../controllers/task.controller');
+
+const {
+  createTaskValidation,
+  updateTaskValidation
+} = require('../middleware/validation.middleware');
+
 const { protect } = require('../middleware/auth.middleware');
-const { body } = require('express-validator');
 
-// Validation middleware
-const validateTask = [
-  body('title')
-    .trim()
-    .notEmpty()
-    .withMessage('Task title is required')
-    .isLength({ max: 100 })
-    .withMessage('Task title must be less than 100 characters')
-];
-
-// All routes are protected
+// Protect all routes
 router.use(protect);
 
 // Get all tasks
 router.get('/', getTasks);
 
 // Create a new task
-router.post('/', validateTask, createTask);
+router.post('/', createTaskValidation, createTask);
 
 // Update a task
-router.put('/:id', validateTask, updateTask);
+router.put('/:id', updateTaskValidation, updateTask);
 
 // Delete a task
 router.delete('/:id', deleteTask);
+
+// Toggle task completion status
+router.patch('/:id/complete', toggleComplete);
+
 
 module.exports = router;

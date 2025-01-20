@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
@@ -27,8 +26,8 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
+      console.error('Auth check error:', error);
       authService.logout();
-      console.error(error);
     } finally {
       setLoading(false);
     }

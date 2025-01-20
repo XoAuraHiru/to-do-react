@@ -6,6 +6,10 @@ const taskSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  scheduledFor: {
+    type: Date,
+    required: true
+  },
   completed: {
     type: Boolean,
     default: false
