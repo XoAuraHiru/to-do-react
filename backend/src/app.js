@@ -1,17 +1,17 @@
-import express, { json } from 'express';
-import cors from 'cors';
-import { connect } from 'mongoose';
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
-import logger from './config/logger';
+const logger = require('./config/logger').default;
 
 // Routes to use
-import authRoutes from './routes/auth.routes.js';
+const authRoutes = require('./routes/auth.routes.js');
 
 const app = express();
 
 // Middlewares to use
 app.use(cors());
-app.use(json());
+app.use(express.json());
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection
-connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 

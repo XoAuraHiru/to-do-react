@@ -1,9 +1,13 @@
-import { Router } from 'express';
-import { getTasks, createTask, updateTask, deleteTask } from '../controllers/task.controller';
-import { protect } from '../middleware/auth.middleware';
-import { body } from 'express-validator';
-
-const router = Router();
+const express = require('express');
+const router = express.Router();
+const { 
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask
+} = require('../controllers/task.controller');
+const { protect } = require('../middleware/auth.middleware');
+const { body } = require('express-validator');
 
 // Validation middleware
 const validateTask = [
@@ -30,4 +34,4 @@ router.put('/:id', validateTask, updateTask);
 // Delete a task
 router.delete('/:id', deleteTask);
 
-export default router;
+module.exports = router;
