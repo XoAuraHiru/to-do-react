@@ -1,17 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
+import express, { json } from 'express';
+import cors from 'cors';
+import { connect } from 'mongoose';
 require('dotenv').config();
-const logger = require('./config/logger');
+import logger from './config/logger';
 
 // Routes to use
-const authRoutes = require('./routes/auth.routes.js');
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
 // Middlewares to use
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
+connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -38,9 +38,9 @@ app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!' });
-  });
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;

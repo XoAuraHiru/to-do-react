@@ -1,7 +1,7 @@
-const nodemailer = require('nodemailer');
-const logger = require('../config/logger');
+import { createTransport } from 'nodemailer';
+import logger from '../config/logger';
 
-const transporter = nodemailer.createTransport({
+const transporter = createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   secure: false,
@@ -15,7 +15,7 @@ const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
   logger.info('Sending verification email', { email });
-  
+
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: email,
@@ -32,7 +32,7 @@ const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
   logger.info('Sending password reset email', { email });
-  
+
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: email,
@@ -46,7 +46,7 @@ const sendPasswordResetEmail = async (email, token) => {
   });
 };
 
-module.exports = {
+export default {
   sendVerificationEmail,
   sendPasswordResetEmail
 };

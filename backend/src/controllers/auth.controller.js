@@ -1,9 +1,9 @@
 
-const User = require('../models/user.model');
-const { generateToken } = require('../utils/jwt');
-const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/email');
+const User = require('../models/user.model').default;
+const { generateToken } = require('../utils/jwt').default;
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/email').default;
 const crypto = require('crypto');
-const logger = require('../config/logger');
+const logger = require('../config/logger').default;
 
 // Register user method {POST /api/auth/register}
 const register = async (req, res) => {
@@ -203,8 +203,8 @@ const verifyToken = async (req, res) => {
     });
   } catch (error) {
     logger.error('Token verification error', { error: error.message });
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Error verifying token'
     });
   }

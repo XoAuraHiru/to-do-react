@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
-const logger = require('../config/logger');
+import { sign, verify } from 'jsonwebtoken';
+import logger from '../config/logger';
 
 const generateToken = (userId) => {
-  return jwt.sign(
+  return sign(
     { id: userId },
     process.env.JWT_SECRET,
     { expiresIn: '24h' }
@@ -11,7 +11,7 @@ const generateToken = (userId) => {
 
 const verifyToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return verify(token, process.env.JWT_SECRET);
   } catch (error) {
     logger.error('Token verification failed', {
       error: error.message
@@ -20,7 +20,7 @@ const verifyToken = (token) => {
   }
 };
 
-module.exports = {
+export default {
   generateToken,
   verifyToken
 };
