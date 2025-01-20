@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const logger = require('./config/logger');
 
 // Routes to use
 const authRoutes = require('./routes/auth.routes.js');
@@ -11,6 +12,17 @@ const app = express();
 // Middlewares to use
 app.use(cors());
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info('Incoming request', {
+    method: req.method,
+    path: req.path,
+    ip: req.ip,
+    userAgent: req.get('user-agent')
+  });
+  next();
+});
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)

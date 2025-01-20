@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const logger = require('../config/logger');
 
 const generateToken = (userId) => {
   return jwt.sign(
@@ -12,6 +13,9 @@ const verifyToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
+    logger.error('Token verification failed', {
+      error: error.message
+    });
     throw new Error('Invalid token');
   }
 };

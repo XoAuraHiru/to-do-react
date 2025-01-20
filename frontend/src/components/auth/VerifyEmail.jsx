@@ -42,7 +42,7 @@ const VerifyEmail = () => {
 
   useEffect(() => {
     verifyEmail();
-  }, [verifyEmail]);
+  }, [verifyEmail]); // Note: This makes two api calls at once which makes the second request to fail. Ignore this issue cause this only happens in development mode where the strictmode is working. wont affect the production build.
 
   const renderContent = () => {
     switch (verificationStatus) {
