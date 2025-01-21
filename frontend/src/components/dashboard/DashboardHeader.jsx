@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { LogOut, User } from "lucide-react";
 
-const DashboardHeader = ({ user, onLogout }) => {
+const DashboardHeader = ({ user = null, onLogout }) => {
   return (
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
       <div>
@@ -42,10 +42,6 @@ DashboardHeader.propTypes = {
     email: PropTypes.string.isRequired
   }),
   onLogout: PropTypes.func.isRequired
-};
-
-DashboardHeader.defaultProps = {
-  user: null
 };
 
 export default DashboardHeader;
