@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Trash2, Edit2, Check, X } from "lucide-react";
+import { TaskShape, TaskEditableProps, TaskCallbacks } from '../../types/taskTypes';
 
 const TaskItem = ({
   task,
@@ -107,26 +107,9 @@ const TaskItem = ({
 };
 
 TaskItem.propTypes = {
-  task: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    scheduledFor: PropTypes.string.isRequired,
-    completed: PropTypes.bool.isRequired
-  }).isRequired,
-  editingTask: PropTypes.string,
-  editText: PropTypes.string.isRequired,
-  editDate: PropTypes.string.isRequired,
-  editTime: PropTypes.string.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onEditSubmit: PropTypes.func.isRequired,
-  onEditCancel: PropTypes.func.isRequired,
-  onEditTextChange: PropTypes.func.isRequired,
-  onEditDateChange: PropTypes.func.isRequired,
-  onEditTimeChange: PropTypes.func.isRequired,
-  onToggleComplete: PropTypes.func.isRequired,
-  isUpcoming: PropTypes.func.isRequired,
-  formatDateTime: PropTypes.func.isRequired
-};
+    task: TaskShape.isRequired,
+    ...TaskEditableProps,
+    ...TaskCallbacks
+  };
 
 export default TaskItem;

@@ -1,18 +1,17 @@
-// src/components/tasks/TaskForm.jsx
-import PropTypes from 'prop-types';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Plus, Loader2, Clock } from "lucide-react";
+import { FormProps } from "../../types/taskTypes";
 
-const TaskForm = ({ 
-  newTask, 
-  scheduledDate, 
-  scheduledTime, 
-  isSubmitting, 
-  onTaskChange, 
-  onDateChange, 
-  onTimeChange, 
-  onSubmit 
+const TaskForm = ({
+  newTask,
+  scheduledDate,
+  scheduledTime,
+  isSubmitting,
+  onTaskChange,
+  onDateChange,
+  onTimeChange,
+  onSubmit,
 }) => {
   return (
     <form onSubmit={onSubmit} className="space-y-4 mb-6">
@@ -24,9 +23,11 @@ const TaskForm = ({
           className="flex-1"
           disabled={isSubmitting}
         />
-        <Button 
+        <Button
           type="submit"
-          disabled={isSubmitting || !newTask.trim() || !scheduledDate || !scheduledTime}
+          disabled={
+            isSubmitting || !newTask.trim() || !scheduledDate || !scheduledTime
+          }
         >
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -46,7 +47,7 @@ const TaskForm = ({
             type="date"
             value={scheduledDate}
             onChange={(e) => onDateChange(e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
+            min={new Date().toISOString().split("T")[0]}
             disabled={isSubmitting}
           />
         </div>
@@ -68,14 +69,7 @@ const TaskForm = ({
 };
 
 TaskForm.propTypes = {
-  newTask: PropTypes.string.isRequired,
-  scheduledDate: PropTypes.string.isRequired,
-  scheduledTime: PropTypes.string.isRequired,
-  isSubmitting: PropTypes.bool.isRequired,
-  onTaskChange: PropTypes.func.isRequired,
-  onDateChange: PropTypes.func.isRequired,
-  onTimeChange: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  ...FormProps,
 };
 
 export default TaskForm;

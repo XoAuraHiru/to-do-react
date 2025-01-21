@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import TaskItem from "./TaskItem";
+import { TaskShape, TaskEditableProps, TaskCallbacks } from '../../types/taskTypes';
+
 
 const TaskList = ({
   tasks,
@@ -77,30 +79,11 @@ const TaskList = ({
 };
 
 TaskList.propTypes = {
-  tasks: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      scheduledFor: PropTypes.string.isRequired,
-      completed: PropTypes.bool.isRequired
-    })
-  ).isRequired,
-  sortOrder: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  onSortToggle: PropTypes.func.isRequired,
-  editingTask: PropTypes.string,
-  editText: PropTypes.string.isRequired,
-  editDate: PropTypes.string.isRequired,
-  editTime: PropTypes.string.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onEditSubmit: PropTypes.func.isRequired,
-  onEditCancel: PropTypes.func.isRequired,
-  onEditTextChange: PropTypes.func.isRequired,
-  onEditDateChange: PropTypes.func.isRequired,
-  onEditTimeChange: PropTypes.func.isRequired,
-  onToggleComplete: PropTypes.func.isRequired,
-  isUpcoming: PropTypes.func.isRequired,
-  formatDateTime: PropTypes.func.isRequired
-};
+    tasks: PropTypes.arrayOf(TaskShape).isRequired,
+    sortOrder: PropTypes.oneOf(['asc', 'desc']).isRequired,
+    onSortToggle: PropTypes.func.isRequired,
+    ...TaskEditableProps,
+    ...TaskCallbacks
+  };
 
 export default TaskList;
