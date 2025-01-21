@@ -4,7 +4,7 @@ const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/emai
 const crypto = require('crypto');
 const logger = require('../config/logger');
 
-// Register user method {POST /api/auth/register}
+// Register user method 
 const register = async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
