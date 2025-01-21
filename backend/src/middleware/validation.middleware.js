@@ -16,7 +16,7 @@ const registerValidation = [
     .isEmail()
     .withMessage('Please enter a valid email')
     .normalizeEmail(),
-  
+
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long')
@@ -24,7 +24,7 @@ const registerValidation = [
     .withMessage('Password must contain at least one number')
     .matches(/[A-Z]/)
     .withMessage('Password must contain at least one uppercase letter'),
-  
+
   body('firstName')
     .trim()
     .notEmpty()
@@ -33,7 +33,7 @@ const registerValidation = [
     .withMessage('First name must be between 2 and 50 characters')
     .matches(/^[a-zA-Z\s]*$/)
     .withMessage('First name can only contain letters and spaces'),
-  
+
   body('lastName')
     .trim()
     .notEmpty()
@@ -42,7 +42,7 @@ const registerValidation = [
     .withMessage('Last name must be between 2 and 50 characters')
     .matches(/^[a-zA-Z\s]*$/)
     .withMessage('Last name can only contain letters and spaces'),
-  
+
   validateRequest
 ];
 
@@ -53,11 +53,11 @@ const loginValidation = [
     .isEmail()
     .withMessage('Please enter a valid email')
     .normalizeEmail(),
-  
+
   body('password')
     .notEmpty()
     .withMessage('Password is required'),
-  
+
   validateRequest
 ];
 
@@ -68,7 +68,7 @@ const forgotPasswordValidation = [
     .isEmail()
     .withMessage('Please enter a valid email')
     .normalizeEmail(),
-  
+
   validateRequest
 ];
 
@@ -77,7 +77,7 @@ const resetPasswordValidation = [
   param('token')
     .notEmpty()
     .withMessage('Reset token is required'),
-  
+
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long')
@@ -85,7 +85,7 @@ const resetPasswordValidation = [
     .withMessage('Password must contain at least one number')
     .matches(/[A-Z]/)
     .withMessage('Password must contain at least one uppercase letter'),
-  
+
   validateRequest
 ];
 
@@ -94,7 +94,7 @@ const verifyEmailValidation = [
   param('token')
     .notEmpty()
     .withMessage('Verification token is required'),
-  
+
   validateRequest
 ];
 
@@ -106,7 +106,7 @@ const createTaskValidation = [
     .withMessage('Task title is required')
     .isLength({ max: 200 })
     .withMessage('Task title must be less than 200 characters'),
-  
+
   body('scheduledFor')
     .notEmpty()
     .withMessage('Scheduled date and time is required')
@@ -120,7 +120,7 @@ const createTaskValidation = [
       }
       return true;
     }),
-  
+
   validateRequest
 ];
 
@@ -131,7 +131,7 @@ const updateTaskValidation = [
     .withMessage('Task title is required')
     .isLength({ max: 200 })
     .withMessage('Task title must be less than 200 characters'),
-  
+
   body('scheduledFor')
     .notEmpty()
     .withMessage('Scheduled date and time is required')
@@ -145,7 +145,7 @@ const updateTaskValidation = [
       }
       return true;
     }),
-  
+
   validateRequest
 ];
 
@@ -175,6 +175,22 @@ const validateProfileUpdate = [
     .normalizeEmail()
 ];
 
+const changePasswordValidation = [
+  body('currentPassword')
+    .notEmpty()
+    .withMessage('Current password is required'),
+
+  body('newPassword')
+    .notEmpty()
+    .withMessage('New password is required')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+
+  validateRequest
+];
+
 module.exports = {
   registerValidation,
   loginValidation,
@@ -183,5 +199,6 @@ module.exports = {
   verifyEmailValidation,
   createTaskValidation,
   updateTaskValidation,
-  validateProfileUpdate
+  validateProfileUpdate,
+  changePasswordValidation
 };

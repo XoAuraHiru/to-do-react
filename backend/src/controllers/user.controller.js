@@ -55,7 +55,41 @@ const getUserActivity = async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user._id);
+
+        logger.info('Changing password', { userId: req.user._id });
+
+        // Verify current password
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            logger.warn('Current password is incorrect', { userId: req.user._id });
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+
+        // Update password
+        user.password = newPassword;
+        await user.save();
+
+        // Log activity
+        await Activity.create({
+            user: req.user._id,
+            action: 'Changed password',
+            timestamp: new Date()
+        });
+
+        logger.info('Password changed successfully', { userId: req.user._id });
+        res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+        logger.error('Error changing password:', error);
+        res.status(500).json({ message: 'Error changing password' });
+    }
+};
+
 module.exports = {
     updateProfile,
-    getUserActivity
+    getUserActivity,
+    changePassword
 };
