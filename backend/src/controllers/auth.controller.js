@@ -45,13 +45,14 @@ const register = async (req, res) => {
         isVerified: user.isVerified
       }
     });
-    
+
   } catch (error) {
     logger.error('Registration error', { error: error.message });
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
+// Login user method
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -94,6 +95,7 @@ const login = async (req, res) => {
   }
 };
 
+// Refresh token
 const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
@@ -132,9 +134,10 @@ const refreshToken = async (req, res) => {
   }
 };
 
+// Logout
 const logout = async (req, res) => {
   try {
-    const { refreshToken } = req.cookies;
+    const refreshToken = req.cookies?.refreshToken;
     
     if (refreshToken) {
       // Find user and remove refresh token
@@ -150,7 +153,12 @@ const logout = async (req, res) => {
     }
 
     // Clear refresh token cookie
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
     
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
