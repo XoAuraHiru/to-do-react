@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,8 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import useUser from '@/hooks/useUser';
 
 const ChangePassword = () => {
+  const { changePassword, isLoading, error: apiError } = useUser();
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -21,56 +22,37 @@ const ChangePassword = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Reset messages
     setError('');
     setSuccess('');
 
-    // Validate passwords match
     if (formData.newPassword !== formData.confirmPassword) {
       setError('New passwords do not match');
       return;
     }
 
-    // Validate password strength
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
     if (!passwordRegex.test(formData.newPassword)) {
       setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number');
       return;
     }
 
-    setIsSubmitting(true);
+    const result = await changePassword({
+      currentPassword: formData.currentPassword,
+      newPassword: formData.newPassword
+    });
 
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        'http://localhost:5000/api/users/change-password',
-        {
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
+    if (result.success) {
       setSuccess('Password changed successfully');
       setFormData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to change password');
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      setError(result.error);
     }
   };
 
@@ -90,10 +72,10 @@ const ChangePassword = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {error && (
+        {(error || apiError) && (
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{error || apiError}</AlertDescription>
           </Alert>
         )}
 
@@ -111,7 +93,7 @@ const ChangePassword = () => {
               type="password"
               value={formData.currentPassword}
               onChange={handleChange('currentPassword')}
-              disabled={isSubmitting}
+              disabled={isLoading}
               required
             />
           </div>
@@ -123,7 +105,7 @@ const ChangePassword = () => {
               type="password"
               value={formData.newPassword}
               onChange={handleChange('newPassword')}
-              disabled={isSubmitting}
+              disabled={isLoading}
               required
             />
           </div>
@@ -135,7 +117,7 @@ const ChangePassword = () => {
               type="password"
               value={formData.confirmPassword}
               onChange={handleChange('confirmPassword')}
-              disabled={isSubmitting}
+              disabled={isLoading}
               required
             />
           </div>
@@ -143,9 +125,9 @@ const ChangePassword = () => {
           <Button 
             type="submit" 
             className="w-full"
-            disabled={isSubmitting}
+            disabled={isLoading}
           >
-            {isSubmitting ? (
+            {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 Changing Password...

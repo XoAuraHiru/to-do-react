@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import useUser from '@/hooks/useUser';
 import ProfileForm from './ProfileForm';
 import ActivityList from './ActivityList';
 import ChangePassword from './ChangePassword';
@@ -13,9 +13,9 @@ import ChangePassword from './ChangePassword';
 const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { updateProfile, getActivity, isLoading, error } = useUser();
+  
   const [state, setState] = useState({
-    isLoading: false,
-    error: '',
     successMessage: '',
     isSubmitting: false,
     activities: [],
@@ -31,25 +31,11 @@ const Profile = () => {
   }, []);
 
   const fetchUserActivity = async () => {
-    setState(prev => ({ ...prev, isLoading: true, error: '' }));
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        'http://localhost:5000/api/users/activity',
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      setState(prev => ({ 
-        ...prev, 
-        activities: response.data,
-        isLoading: false 
-      }));
-    } catch (err) {
+    const result = await getActivity();
+    if (result.success) {
       setState(prev => ({
         ...prev,
-        error: err.response?.data?.message || 'Failed to fetch user activity',
-        isLoading: false
+        activities: result.data
       }));
     }
   };
@@ -59,34 +45,19 @@ const Profile = () => {
     setState(prev => ({ 
       ...prev, 
       isSubmitting: true, 
-      error: '', 
       successMessage: '' 
     }));
 
-    try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        'http://localhost:5000/api/users/profile',
-        state.profileData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      setState(prev => ({ 
-        ...prev,
-        successMessage: 'Profile updated successfully!',
-        isSubmitting: false
-      }));
-      fetchUserActivity(); // Refresh activity after update
-    } catch (err) {
-      setState(prev => ({
-        ...prev,
-        error: err.response?.data?.message || 'Failed to update profile',
-        isSubmitting: false
-      }));
+    const result = await updateProfile(state.profileData);
+    
+    setState(prev => ({
+      ...prev,
+      successMessage: result.success ? 'Profile updated successfully!' : '',
+      isSubmitting: false
+    }));
+
+    if (result.success) {
+      fetchUserActivity();
     }
   };
 
@@ -131,7 +102,7 @@ const Profile = () => {
                 onSubmit={handleProfileUpdate}
                 onChange={handleProfileChange}
                 isSubmitting={state.isSubmitting}
-                error={state.error}
+                error={error}
                 successMessage={state.successMessage}
               />
             </TabsContent>
@@ -139,7 +110,7 @@ const Profile = () => {
             <TabsContent value="activity">
               <ActivityList
                 activities={state.activities}
-                isLoading={state.isLoading}
+                isLoading={isLoading}
               />
             </TabsContent>
 
