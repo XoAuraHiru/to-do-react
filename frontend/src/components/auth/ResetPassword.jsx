@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import authService from '@/services/auth.service';
+import { validatePassword, validatePasswordsMatch } from '../../helpers/validation';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -27,14 +28,25 @@ const ResetPassword = () => {
   };
 
   const validateForm = () => {
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+
+    // Validate password strength
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.error);
       return false;
     }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+
+    // Validate passwords match
+    const passwordsMatchValidation = validatePasswordsMatch(
+      formData.password,
+      formData.confirmPassword
+    );
+
+    if (!passwordsMatchValidation.isValid) {
+      setError(passwordsMatchValidation.error);
       return false;
     }
+    
     return true;
   };
 

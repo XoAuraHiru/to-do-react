@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { AlertCircle } from "lucide-react"
+import { isValidEmail } from '../../helpers/validation';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const Login = () => {
       setError('Please fill in all fields');
       return false;
     }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    if (!isValidEmail(formData.email)) {
       setError('Please enter a valid email address');
       return false;
     }

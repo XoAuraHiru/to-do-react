@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { validatePassword, validatePasswordsMatch } from '../../helpers/validation';
 import useUser from '@/hooks/useUser';
 
 const ChangePassword = () => {
@@ -23,21 +24,40 @@ const ChangePassword = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const validateForm = () => {
+    
+    // Validate new password strength
+    const passwordValidation = validatePassword(formData.newPassword);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.error);
+      return false;
+    }
+
+    // Validate passwords match
+    const passwordsMatchValidation = validatePasswordsMatch(
+      formData.newPassword,
+      formData.confirmPassword
+    );
+    if (!passwordsMatchValidation.isValid) {
+      setError(passwordsMatchValidation.error);
+      return false;
+    }
+
+    // Validate current password is not empty
+    if (!formData.currentPassword) {
+      setError('Current password is required');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      setError('New passwords do not match');
-      return;
-    }
-
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-    if (!passwordRegex.test(formData.newPassword)) {
-      setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number');
-      return;
-    }
+    if (!validateForm()) return;
 
     const result = await changePassword({
       currentPassword: formData.currentPassword,

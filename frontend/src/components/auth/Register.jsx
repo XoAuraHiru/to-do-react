@@ -1,66 +1,87 @@
-
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import {
+  isValidEmail,
+  validatePassword,
+  validateName,
+  validatePasswordsMatch,
+} from "../../helpers/validation";
 
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const validateForm = () => {
-    if (!formData.firstName.trim()) {
-      setError('First name is required');
+    
+    // Validate first name
+    const firstNameValidation = validateName(formData.firstName, "First name");
+    if (!firstNameValidation.isValid) {
+      setError(firstNameValidation.error);
       return false;
     }
-    if (!formData.lastName.trim()) {
-      setError('Last name is required');
+
+    // Validate last name
+    const lastNameValidation = validateName(formData.lastName, "Last name");
+    if (!lastNameValidation.isValid) {
+      setError(lastNameValidation.error);
       return false;
     }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
+
+    // Validate email
+    if (!isValidEmail(formData.email)) {
+      setError("Please enter a valid email address");
       return false;
     }
-    if (formData.password.length < 6) {
-      if (!/[a-zA-Z]/.test(formData.password)) {
-        setError('Password must contain at least one letter');
-        return false;
-      } return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+
+    // Validate password strength
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.error);
       return false;
     }
+
+    // Validate passwords match
+    const passwordsMatchValidation = validatePasswordsMatch(
+      formData.password,
+      formData.confirmPassword
+    );
+    if (!passwordsMatchValidation.isValid) {
+      setError(passwordsMatchValidation.error);
+      return false;
+    }
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validateForm()) return;
 
@@ -70,19 +91,18 @@ const Register = () => {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
-        password: formData.password
+        password: formData.password,
       });
 
       if (success) {
-        navigate('/verify-email-sent');
+        navigate("/verify-email-sent");
       } else {
-        console.error('Registration error:', registrationError);
-        setError(registrationError || 'Registration failed');
+        console.error("Registration error:", registrationError);
+        setError(registrationError || "Registration failed");
       }
-
     } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.response?.data?.message || 'An unexpected error occurred');
+      console.error("Registration error:", err);
+      setError(err.response?.data?.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +114,7 @@ const Register = () => {
         <CardHeader>
           <h2 className="text-2xl font-bold text-center">Create an account</h2>
           <p className="text-center text-muted-foreground">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link to="/login" className="text-primary hover:underline">
               Sign in
             </Link>
@@ -180,12 +200,8 @@ const Register = () => {
               />
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating account...' : 'Create account'}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
         </CardContent>
