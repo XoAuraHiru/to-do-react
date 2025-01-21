@@ -8,18 +8,18 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
-import ForgotPassword from './components/auth/ForgotPassword';
-import ResetPassword from './components/auth/ResetPassword';
+import ForgotPassword from "./components/auth/ForgotPassword";
+import ResetPassword from "./components/auth/ResetPassword";
 import Dashboard from "./components/dashboard/Dashboard";
 import VerifyEmail from "./components/auth/VerifyEmail";
 import VerifyEmailSent from "./components/auth/VerifyEmailSent";
+import Profile from "./components/profile/Profile";
 
 const App = () => {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-
           {/* Public routes - For Authentication prosesses */}
 
           <Route path="/login" element={<Login />} />
@@ -36,6 +36,15 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
