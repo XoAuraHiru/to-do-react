@@ -24,6 +24,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  refreshToken: {
+    type: String
+  },
+  refreshTokenExpiryDate: {
+    type: Date
+  },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   verificationToken: String,
@@ -35,7 +41,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Middleware to hash password before saving
+// Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
@@ -48,7 +54,7 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// compare password here
+// Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };

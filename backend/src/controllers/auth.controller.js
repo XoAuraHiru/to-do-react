@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const { generateToken } = require('../utils/jwt');
+const { generateTokens, generateAccessToken } = require('../utils/jwt');
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/email');
 const crypto = require('crypto');
 const logger = require('../config/logger');
@@ -8,8 +8,6 @@ const logger = require('../config/logger');
 const register = async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
-
-    logger.info('Registering user', { email });
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -30,13 +28,11 @@ const register = async (req, res) => {
       verificationToken
     });
 
-    logger.info('User registered successfully', { email });
-
     // Send verification email
     await sendVerificationEmail(email, verificationToken);
 
     // Generate JWT
-    const token = generateToken(user._id);
+    const token = generateTokens(user._id);
 
     res.status(201).json({
       message: 'Registration successful. Please check your email to verify your account.',
@@ -49,44 +45,41 @@ const register = async (req, res) => {
         isVerified: user.isVerified
       }
     });
+    
   } catch (error) {
     logger.error('Registration error', { error: error.message });
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-// Login user
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    logger.info('User login', { email });
-
-    // Find user
+    
     const user = await User.findOne({ email });
-    if (!user) {
-      logger.warn('Login failed - User not found', { email });
+    if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Check password
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      logger.warn('Login failed - Invalid password', { email });
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Check if user is verified
     if (!user.isVerified) {
-      logger.warn('Login failed - Email not verified', { email });
       return res.status(401).json({ message: 'Please verify your email first' });
     }
 
-    // Generate JWT
-    const token = generateToken(user._id);
+    // Generate new tokens
+    const tokens = await generateTokens(user);
+
+    // Set refresh token in HTTP-only cookie
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      domain: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'localhost',
+      path: '/'
+    });
 
     res.json({
-      token,
+      accessToken: tokens.accessToken,
       user: {
         id: user._id,
         email: user.email,
@@ -96,8 +89,73 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Login error', { error: error.message });
-    res.status(500).json({ message: 'Server error', error: error.message });
+    logger.error('Login error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'Refresh token required' });
+    }
+
+    // Find user with matching refresh token that hasn't expired
+    const user = await User.findOne({
+      refreshToken,
+      refreshTokenExpiryDate: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid refresh token' });
+    }
+
+    // Generate new tokens
+    const tokens = await generateTokens(user);
+
+    // Set new refresh token in HTTP-only cookie
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    });
+
+    res.json({
+      accessToken: tokens.accessToken
+    });
+  } catch (error) {
+    logger.error('Refresh token error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+    
+    if (refreshToken) {
+      // Find user and remove refresh token
+      await User.findOneAndUpdate(
+        { refreshToken },
+        { 
+          $unset: { 
+            refreshToken: 1,
+            refreshTokenExpiryDate: 1
+          }
+        }
+      );
+    }
+
+    // Clear refresh token cookie
+    res.clearCookie('refreshToken');
+    
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    logger.error('Logout error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -215,5 +273,7 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
-  verifyToken
+  verifyToken,
+  refreshToken,
+  logout
 };

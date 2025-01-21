@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const logger = require('../config/logger').default;
+const logger = require('../config/logger');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,

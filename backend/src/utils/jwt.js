@@ -1,26 +1,52 @@
 const jwt = require('jsonwebtoken');
-const logger = require('../config/logger').default;
+const crypto = require('crypto');
 
-const generateToken = (userId) => {
+const generateAccessToken = (userId) => {
   return jwt.sign(
     { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+    process.env.JWT_ACCESS_SECRET,
+    { expiresIn: '15m' } // 15minutes access token
   );
 };
 
-const verifyToken = (token) => {
+const generateRefreshToken = () => {
+  return crypto.randomBytes(40).toString('hex');
+};
+
+const verifyAccessToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
   } catch (error) {
-    logger.error('Token verification failed', {
-      error: error.message
-    });
     throw new Error('Invalid token');
   }
 };
 
+const generateTokens = async (user) => {
+  // Generate access token
+  const accessToken = generateAccessToken(user._id);
+
+  // Generate refresh token
+  const refreshToken = generateRefreshToken();
+  
+  // Calculate refresh token expiry (30 days)
+  const refreshTokenExpiryDate = new Date();
+  refreshTokenExpiryDate.setDate(refreshTokenExpiryDate.getDate() + 30);
+
+  // Save refresh token to user
+  user.refreshToken = refreshToken;
+  user.refreshTokenExpiryDate = refreshTokenExpiryDate;
+  await user.save();
+
+  return {
+    accessToken,
+    refreshToken,
+    refreshTokenExpiryDate
+  };
+};
+
 module.exports = {
-  generateToken,
-  verifyToken
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  generateTokens
 };

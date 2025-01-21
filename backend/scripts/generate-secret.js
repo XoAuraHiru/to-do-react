@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 
-//simple script to generate a secret key for the JWT
+const accessSecret = crypto.randomBytes(64).toString('hex');
+const refreshSecret = crypto.randomBytes(64).toString('hex');
 
-const secret = crypto.randomBytes(32).toString('hex');
-console.log(secret);
+console.log('JWT_ACCESS_SECRET=' + accessSecret);
+console.log('JWT_REFRESH_SECRET=' + refreshSecret);
